@@ -14,6 +14,7 @@ const pledgeRoutes = require('./routes/pledges');
 const transactionRoutes = require('./routes/transactions');
 const walletRoutes = require('./routes/wallet');
 const analyticsRoutes = require('./routes/analytics');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -51,6 +52,7 @@ app.use('/api/pledges', pledgeRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/admin', adminRoutes);
 
 // 404 handler
 app.use((req, res) => {
