@@ -1,13 +1,27 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const fs = require('fs');
 
 // Initialize database
 const isProduction = process.env.NODE_ENV === 'production';
-const dbPath = isProduction ? '/data/crowdfunding.db' : path.join(__dirname, 'crowdfunding.db');
+let dbPath;
 
-// Create data directory in production if it doesn't exist
-if (isProduction && !require('fs').existsSync('/data')) {
-  require('fs').mkdirSync('/data', { recursive: true });
+if (isProduction) {
+  // Try to use /tmp directory if we can't write to /data
+  try {
+    if (!fs.existsSync('/data')) {
+      fs.mkdirSync('/data', { recursive: true });
+    }
+    // Test write permission
+    fs.writeFileSync('/data/test.txt', 'test');
+    fs.unlinkSync('/data/test.txt');
+    dbPath = '/data/crowdfunding.db';
+  } catch (err) {
+    console.warn('Could not write to /data, falling back to /tmp');
+    dbPath = '/tmp/crowdfunding.db';
+  }
+} else {
+  dbPath = path.join(__dirname, 'crowdfunding.db');
 }
 
 const db = new sqlite3.Database(dbPath, (err) => {
