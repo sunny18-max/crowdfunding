@@ -11,7 +11,14 @@ export const register = createAsyncThunk(
       localStorage.setItem('user', JSON.stringify(response.data.user));
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.error || 'Registration failed');
+      console.error('Registration error:', error);
+      if (error.code === 'ECONNABORTED') {
+        return rejectWithValue('Request timeout. The server might be slow to respond. Please try again.');
+      }
+      if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
+        return rejectWithValue('Network error. Please ensure the backend server is running and accessible.');
+      }
+      return rejectWithValue(error.response?.data?.error || error.message || 'Registration failed');
     }
   }
 );

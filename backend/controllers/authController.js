@@ -4,9 +4,8 @@ const db = require('../database/dbHelper');
 
 // Register new user
 exports.register = async (req, res, next) => {
-  const client = await db.getClient();
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, wallet_balance = 1000 } = req.body; // Set default wallet balance
     console.log('Registration attempt for:', { email, name });
 
     // Validate input
@@ -16,8 +15,8 @@ exports.register = async (req, res, next) => {
     }
 
     // Check if user already exists
-    const existingUser = await client.query('SELECT * FROM users WHERE email = $1', [email]);
-    if (existingUser.rows.length > 0) {
+    const existingUser = await db.get('SELECT * FROM users WHERE email = ?', [email]);
+    if (existingUser) {
       console.log('User already exists with email:', email);
       return res.status(400).json({ error: 'User already exists with this email' });
     }
@@ -28,12 +27,12 @@ exports.register = async (req, res, next) => {
 
     // Insert user
     console.log('Inserting new user...');
-    const result = await client.query(
-      'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id',
-      [name, email, hashedPassword]
+    const result = await db.run(
+      'INSERT INTO users (name, email, password, wallet_balance) VALUES (?, ?, ?, ?)',
+      [name, email, hashedPassword, wallet_balance]
     );
 
-    const userId = result.rows[0].id;
+    const userId = result.lastID;
     console.log('User created with ID:', userId);
 
     // Generate JWT token
@@ -55,8 +54,6 @@ exports.register = async (req, res, next) => {
   } catch (error) {
     console.error('Registration error:', error);
     next(error);
-  } finally {
-    client.release();
   }
 };
 

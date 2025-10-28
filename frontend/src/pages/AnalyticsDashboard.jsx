@@ -1,12 +1,26 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import { BarChart3, TrendingUp, Users, DollarSign, Target, Activity, Award, AlertCircle } from 'lucide-react';
+import { analyticsAPI } from '../services/api';
 
 function AnalyticsDashboard() {
-  const [platformStats, setPlatformStats] = useState(null);
+  const [platformStats, setPlatformStats] = useState({
+    totalCampaigns: 0,
+    totalPledges: 0,
+    totalAmountPledged: 0,
+    activeCampaigns: 0,
+    successfulCampaigns: 0
+  });
   const [topCampaigns, setTopCampaigns] = useState([]);
-  const [successRates, setSuccessRates] = useState(null);
-  const [pledgeStats, setPledgeStats] = useState(null);
+  const [successRates, setSuccessRates] = useState({
+    successRate: 0,
+    averageFunding: 0,
+    totalCampaigns: 0
+  });
+  const [pledgeStats, setPledgeStats] = useState({
+    totalPledges: 0,
+    totalAmount: 0,
+    averagePledge: 0
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,17 +30,47 @@ function AnalyticsDashboard() {
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
-      const [platformRes, topRes, ratesRes, pledgeRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/analytics/platform-stats'),
-        axios.get('http://localhost:5000/api/analytics/top-campaigns?limit=5'),
-        axios.get('http://localhost:5000/api/analytics/success-rates'),
-        axios.get('http://localhost:5000/api/analytics/pledge-stats')
-      ]);
-
-      setPlatformStats(platformRes.data.stats);
-      setTopCampaigns(topRes.data.campaigns);
-      setSuccessRates(ratesRes.data.rates);
-      setPledgeStats(pledgeRes.data.stats);
+      
+      // Fetch platform stats from analytics API
+      const platformRes = await analyticsAPI.getPlatformStats();
+      setPlatformStats(platformRes.data.stats || {
+        total_users: 0,
+        total_campaigns: 0,
+        active_campaigns: 0,
+        successful_campaigns: 0,
+        total_funds_raised: 0,
+        total_pledges: 0,
+        total_pledged_amount: 0,
+        avg_user_balance: 0,
+        active_backers: 0
+      });
+      
+      // Fetch top campaigns
+      const topCampaignsRes = await analyticsAPI.getTopCampaigns(5);
+      setTopCampaigns(topCampaignsRes.data.campaigns || []);
+      
+      // Fetch success rates
+      const successRatesRes = await analyticsAPI.getSuccessRates();
+      setSuccessRates(successRatesRes.data.rates || {
+        total_campaigns: 0,
+        successful_count: 0,
+        failed_count: 0,
+        active_count: 0,
+        success_rate: 0,
+        avg_successful_amount: 0,
+        avg_failed_amount: 0
+      });
+      
+      // Fetch pledge stats
+      const pledgeStatsRes = await analyticsAPI.getPledgeStats();
+      setPledgeStats(pledgeStatsRes.data.stats || {
+        total_backers: 0,
+        total_pledges: 0,
+        total_amount: 0,
+        avg_pledge_amount: 0,
+        min_pledge: 0,
+        max_pledge: 0
+      });
     } catch (error) {
       console.error('Error fetching analytics:', error);
     } finally {

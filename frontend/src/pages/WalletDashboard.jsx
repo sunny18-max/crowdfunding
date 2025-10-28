@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import axios from 'axios';
 import { Wallet, TrendingUp, TrendingDown, RefreshCw, Plus, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { walletAPI, transactionsAPI } from '../services/api';
 
 function WalletDashboard() {
   const { user } = useSelector((state) => state.auth);
@@ -19,29 +19,53 @@ function WalletDashboard() {
   const fetchWalletData = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:5000/api/wallet/${user.id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+      
+      // Fetch wallet data
+      const walletRes = await walletAPI.getWallet(user.id);
+      
+      // Backend returns { user, transactions, stats }
+      setWalletData({
+        user: walletRes.data.user || { wallet_balance: 0 },
+        transactions: walletRes.data.transactions || [],
+        stats: walletRes.data.stats || {
+          total_transactions: 0,
+          total_debits: 0,
+          total_credits: 0,
+          total_refunds: 0
+        }
       });
-      setWalletData(response.data);
     } catch (error) {
       console.error('Error fetching wallet data:', error);
+      // Set default values if there's an error
+      setWalletData({
+        user: { wallet_balance: 0 },
+        transactions: [],
+        stats: {
+          total_transactions: 0,
+          total_debits: 0,
+          total_credits: 0,
+          total_refunds: 0
+        }
+      });
     } finally {
       setLoading(false);
     }
   };
 
   const handleAddFunds = async () => {
+    if (!addAmount || isNaN(addAmount) || parseFloat(addAmount) <= 0) {
+      alert('Please enter a valid amount');
+      return;
+    }
+    
     try {
-      const token = localStorage.getItem('token');
-      await axios.post(
-        `http://localhost:5000/api/wallet/${user.id}/add-funds`,
-        { amount: parseFloat(addAmount) },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      // Add funds to wallet
+      await walletAPI.addFunds(user.id, parseFloat(addAmount));
+      
       setAddAmount('');
       setShowAddFunds(false);
-      fetchWalletData();
+      await fetchWalletData(); // Refresh wallet data
+      alert('Funds added successfully!');
     } catch (error) {
       console.error('Error adding funds:', error);
       alert(error.response?.data?.error || 'Failed to add funds');
