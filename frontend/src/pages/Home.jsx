@@ -30,7 +30,7 @@ function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-20">
+      <div className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-20" data-aos="fade-down">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-5xl font-bold mb-6">
@@ -55,19 +55,19 @@ function Home() {
       <div className="bg-white py-12 border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div>
+            <div data-aos="fade-up">
               <div className="text-4xl font-bold text-primary-600 mb-2">
                 {campaigns.length}
               </div>
               <div className="text-gray-600">Total Campaigns</div>
             </div>
-            <div>
+            <div data-aos="fade-up" data-aos-delay="100">
               <div className="text-4xl font-bold text-green-600 mb-2">
                 {campaigns.filter(c => c.status === 'successful').length}
               </div>
               <div className="text-gray-600">Successful Projects</div>
             </div>
-            <div>
+            <div data-aos="fade-up" data-aos-delay="200">
               <div className="text-4xl font-bold text-blue-600 mb-2">
                 ${campaigns.reduce((sum, c) => sum + (c.total_pledged || 0), 0).toLocaleString()}
               </div>
@@ -80,7 +80,7 @@ function Home() {
       {/* Campaigns Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Search and Filter */}
-        <div className="mb-8">
+        <div className="mb-8" data-aos="fade-up">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             {/* Search */}
             <div className="relative flex-1 max-w-md">

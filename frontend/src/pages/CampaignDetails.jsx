@@ -80,11 +80,11 @@ function CampaignDetails() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6" data-aos="fade-right">
             {/* Campaign Header */}
             <div className="card p-8">
               <div className="flex items-start justify-between mb-4">
-                <h1 className="text-3xl font-bold text-gray-900 flex-1">
+                <h1 className="text-3xl font-bold text-gray-900 flex-1" data-aos="fade-down">
                   {campaign.title}
                 </h1>
                 {getStatusBadge()}
@@ -109,7 +109,7 @@ function CampaignDetails() {
 
             {/* Backers List */}
             {campaign.backers && campaign.backers.length > 0 && (
-              <div className="card p-8">
+              <div className="card p-8" data-aos="fade-up">
                 <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
                   <Users className="w-5 h-5 mr-2" />
                   Backers ({campaign.backers_count})
@@ -150,7 +150,7 @@ function CampaignDetails() {
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="card p-6 sticky top-24">
+            <div className="card p-6 sticky top-24" data-aos="fade-left">
               {/* Funding Progress */}
               <div className="mb-6">
                 <div className="text-4xl font-bold text-gray-900 mb-2">

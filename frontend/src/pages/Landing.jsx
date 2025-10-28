@@ -62,7 +62,7 @@ function Landing() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-b border-gray-200 z-50">
+      <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-b border-gray-200 z-50" data-aos="fade-down">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
@@ -96,7 +96,7 @@ function Landing() {
       <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
+            <div className="space-y-8" data-aos="fade-right">
               <div className="inline-flex items-center space-x-2 bg-primary-50 px-4 py-2 rounded-full">
                 <Star className="w-4 h-4 text-primary-600" />
                 <span className="text-sm font-medium text-primary-700">
@@ -104,14 +104,14 @@ function Landing() {
                 </span>
               </div>
               
-              <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+              <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight" data-aos="fade-up">
                 Turn Your
                 <span className="block bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
                   Dreams Into Reality
                 </span>
               </h1>
               
-              <p className="text-xl text-gray-600 leading-relaxed">
+              <p className="text-xl text-gray-600 leading-relaxed" data-aos="fade-up" data-aos-delay="100">
                 Join the world's most trusted crowdfunding platform. Launch your project, 
                 connect with backers, and bring your innovative ideas to life with our 
                 secure, ACID-compliant transaction system.
@@ -133,7 +133,7 @@ function Landing() {
                 </Link>
               </div>
 
-              <div className="flex items-center space-x-8 pt-4">
+              <div className="flex items-center space-x-8 pt-4" data-aos="fade-up" data-aos-delay="300">
                 {stats.slice(0, 2).map((stat, index) => (
                   <div key={index}>
                     <div className="text-3xl font-bold text-gray-900">{stat.value}</div>
@@ -143,14 +143,14 @@ function Landing() {
               </div>
             </div>
 
-            <div className="relative">
+            <div className="relative" data-aos="fade-left">
               <div className="absolute inset-0 bg-gradient-to-r from-primary-400 to-primary-600 rounded-3xl blur-3xl opacity-20"></div>
               <img
                 src="https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800&h=600&fit=crop"
                 alt="Crowdfunding Success"
                 className="relative rounded-3xl shadow-2xl w-full h-auto"
               />
-              <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-xl p-6 max-w-xs">
+              <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-xl p-6 max-w-xs" data-aos="fade-up" data-aos-delay="200">
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                     <TrendingUp className="w-6 h-6 text-green-600" />
@@ -171,7 +171,7 @@ function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
-              <div key={index} className="text-center">
+              <div key={index} className="text-center" data-aos="fade-up" data-aos-delay={index * 100}>
                 <div className="text-4xl lg:text-5xl font-bold text-white mb-2">
                   {stat.value}
                 </div>
@@ -185,7 +185,7 @@ function Landing() {
       {/* Features Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16" data-aos="fade-up">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
               Why Choose FundStarter?
             </h2>
@@ -201,6 +201,8 @@ function Landing() {
               return (
                 <div
                   key={index}
+                  data-aos="fade-up"
+                  data-aos-delay={index * 100}
                   className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all border border-gray-100 group hover:-translate-y-1"
                 >
                   <div className="w-14 h-14 bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
@@ -222,7 +224,7 @@ function Landing() {
       {/* Featured Campaigns */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16" data-aos="fade-up">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
               Featured Campaigns
             </h2>
@@ -235,6 +237,8 @@ function Landing() {
             {campaigns.map((campaign, index) => (
               <div
                 key={index}
+                data-aos="fade-up"
+                data-aos-delay={index * 100}
                 className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all group"
               >
                 <div className="relative h-48 overflow-hidden">
@@ -290,7 +294,7 @@ function Landing() {
             ))}
           </div>
 
-          <div className="text-center mt-12">
+          <div className="text-center mt-12" data-aos="fade-up">
             <Link
               to="/register"
               className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl hover:from-primary-700 hover:to-primary-800 transition-all shadow-lg font-semibold"
@@ -305,7 +309,7 @@ function Landing() {
       {/* How It Works */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16" data-aos="fade-up">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
               How It Works
             </h2>
@@ -337,7 +341,7 @@ function Landing() {
             ].map((item, index) => {
               const Icon = item.icon;
               return (
-                <div key={index} className="relative">
+                <div key={index} className="relative" data-aos="fade-up" data-aos-delay={index * 100}>
                   {index < 2 && (
                     <div className="hidden md:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-primary-300 to-transparent -z-10"></div>
                   )}
@@ -364,7 +368,7 @@ function Landing() {
 
       {/* CTA Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800">
-        <div className="max-w-4xl mx-auto text-center">
+        <div className="max-w-4xl mx-auto text-center" data-aos="zoom-in">
           <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
             Ready to Make Your Dream a Reality?
           </h2>
@@ -391,7 +395,7 @@ function Landing() {
 
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-300 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto" data-aos="fade-up">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">

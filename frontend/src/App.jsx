@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Sidebar from './components/Sidebar';
 import Landing from './pages/Landing';
@@ -11,69 +12,66 @@ import CreateCampaign from './pages/CreateCampaign';
 import MyPledges from './pages/MyPledges';
 import WalletDashboard from './pages/WalletDashboard';
 import AnalyticsDashboard from './pages/AnalyticsDashboard';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+
+// Layout for authenticated users (with sidebar)
+const DashboardLayout = () => (
+  <div className="min-h-screen bg-gray-50 flex">
+    <Sidebar />
+    <main className="flex-1 lg:ml-64 p-4 sm:p-6 lg:p-8">
+      <Outlet />
+    </main>
+  </div>
+);
+
+// Layout for public pages (no sidebar)
+const PublicLayout = () => (
+  <div className="min-h-screen bg-white">
+    <main>
+      <Outlet />
+    </main>
+  </div>
+);
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.auth);
 
-  // Landing page layout (no sidebar)
-  if (!isAuthenticated && window.location.pathname === '/') {
-    return (
-      <Router>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/analytics" element={<AnalyticsDashboard />} />
-          <Route path="/campaigns/:id" element={<CampaignDetails />} />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </Router>
-    );
-  }
+  useEffect(() => {
+    AOS.init({
+      duration: 800,
+      once: true,
+      easing: 'ease-in-out',
+    });
+  }, []);
 
-  // Dashboard layout (with sidebar)
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50 flex">
-        <Sidebar />
-        <main className="flex-1 lg:ml-64">
-          <Routes>
+      <Routes>
+        {/* Public Routes */}
+        <Route element={<PublicLayout />}>
+          <Route path="/landing" element={!isAuthenticated ? <Landing /> : <Navigate to="/" />} />
+          <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
+          <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/" />} />
+        </Route>
+
+        {/* Authenticated Routes */}
+        <Route element={isAuthenticated ? <DashboardLayout /> : <Navigate to="/landing" />}>
           <Route path="/" element={<Home />} />
-          <Route 
-            path="/login" 
-            element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} 
-          />
-          <Route 
-            path="/register" 
-            element={isAuthenticated ? <Navigate to="/dashboard" /> : <Register />} 
-          />
-          <Route 
-            path="/dashboard" 
-            element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} 
-          />
-          <Route 
-            path="/campaigns/:id" 
-            element={<CampaignDetails />} 
-          />
-          <Route 
-            path="/create-campaign" 
-            element={isAuthenticated ? <CreateCampaign /> : <Navigate to="/login" />} 
-          />
-          <Route 
-            path="/my-pledges" 
-            element={isAuthenticated ? <MyPledges /> : <Navigate to="/login" />} 
-          />
-          <Route 
-            path="/wallet" 
-            element={isAuthenticated ? <WalletDashboard /> : <Navigate to="/login" />} 
-          />
-          <Route 
-            path="/analytics" 
-            element={<AnalyticsDashboard />} 
-          />
-          </Routes>
-        </main>
-      </div>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/create-campaign" element={<CreateCampaign />} />
+          <Route path="/my-pledges" element={<MyPledges />} />
+          <Route path="/wallet" element={<WalletDashboard />} />
+        </Route>
+
+        {/* Routes accessible to both logged-in and public users */}
+        <Route element={<DashboardLayout />}>
+           <Route path="/campaigns/:id" element={<CampaignDetails />} />
+           <Route path="/analytics" element={<AnalyticsDashboard />} />
+        </Route>
+
+        <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/landing"} />} />
+      </Routes>
     </Router>
   );
 }

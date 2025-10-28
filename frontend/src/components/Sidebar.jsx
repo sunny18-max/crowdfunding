@@ -25,7 +25,7 @@ function Sidebar() {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/');
+    navigate('/landing');
     setIsMobileOpen(false);
   };
 
@@ -145,14 +145,14 @@ function Sidebar() {
               <Link
                 to="/login"
                 onClick={() => setIsMobileOpen(false)}
-                className="block w-full text-center px-4 py-2 border border-primary-600 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors"
+                className="block w-full text-center px-4 py-3 border border-primary-600 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors font-medium"
               >
                 Login
               </Link>
               <Link
                 to="/register"
                 onClick={() => setIsMobileOpen(false)}
-                className="block w-full text-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                className="block w-full text-center px-4 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
               >
                 Sign Up
               </Link>

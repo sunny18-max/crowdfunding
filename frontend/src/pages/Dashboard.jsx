@@ -24,7 +24,7 @@ function Dashboard() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-8" data-aos="fade-down">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Welcome back, {user?.name}!
           </h1>
@@ -33,7 +33,7 @@ function Dashboard() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="card p-6">
+          <div className="card p-6" data-aos="fade-up">
             <div className="flex items-center justify-between mb-2">
               <span className="text-gray-600 text-sm font-medium">My Campaigns</span>
               <TrendingUp className="w-5 h-5 text-primary-600" />
@@ -43,7 +43,7 @@ function Dashboard() {
             </div>
           </div>
 
-          <div className="card p-6">
+          <div className="card p-6" data-aos="fade-up" data-aos-delay="100">
             <div className="flex items-center justify-between mb-2">
               <span className="text-gray-600 text-sm font-medium">Total Pledges</span>
               <Heart className="w-5 h-5 text-red-600" />
@@ -53,7 +53,7 @@ function Dashboard() {
             </div>
           </div>
 
-          <div className="card p-6">
+          <div className="card p-6" data-aos="fade-up" data-aos-delay="200">
             <div className="flex items-center justify-between mb-2">
               <span className="text-gray-600 text-sm font-medium">Amount Pledged</span>
               <DollarSign className="w-5 h-5 text-green-600" />
@@ -63,7 +63,7 @@ function Dashboard() {
             </div>
           </div>
 
-          <div className="card p-6">
+          <div className="card p-6" data-aos="fade-up" data-aos-delay="300">
             <div className="flex items-center justify-between mb-2">
               <span className="text-gray-600 text-sm font-medium">Success Rate</span>
               <CheckCircle className="w-5 h-5 text-blue-600" />
@@ -78,7 +78,7 @@ function Dashboard() {
 
         {/* My Campaigns Section */}
         <div className="mb-12">
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-between items-center mb-6" data-aos="fade-up">
             <h2 className="text-2xl font-bold text-gray-900">My Campaigns</h2>
             <Link to="/create-campaign" className="btn-primary flex items-center space-x-2">
               <Plus className="w-5 h-5" />
@@ -90,7 +90,7 @@ function Dashboard() {
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent"></div>
             </div>
-          ) : userCampaigns.length === 0 ? (
+          ) : userCampaigns.length === 0 ? ( 
             <div className="card p-12 text-center">
               <TrendingUp className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
@@ -115,7 +115,7 @@ function Dashboard() {
 
         {/* Recent Pledges Section */}
         <div>
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-between items-center mb-6" data-aos="fade-up">
             <h2 className="text-2xl font-bold text-gray-900">Recent Pledges</h2>
             <Link to="/my-pledges" className="text-primary-600 hover:text-primary-700 font-medium">
               View All →
@@ -123,7 +123,7 @@ function Dashboard() {
           </div>
 
           {pledges.length === 0 ? (
-            <div className="card p-12 text-center">
+            <div className="card p-12 text-center" data-aos="fade-up">
               <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 No pledges yet
@@ -136,7 +136,7 @@ function Dashboard() {
               </Link>
             </div>
           ) : (
-            <div className="card overflow-hidden">
+            <div className="card overflow-hidden" data-aos="fade-up">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b border-gray-200">

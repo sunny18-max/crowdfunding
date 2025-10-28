@@ -23,7 +23,8 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({
   origin: [
     'http://localhost:5173',
-    'https://crowdfunding-helper.netlify.app'
+    'https://crowdfunding-helper.netlify.app', // Your old Netlify deployment
+    process.env.FRONTEND_URL // New Vercel URL from environment variables
   ],
   credentials: true
 }));
