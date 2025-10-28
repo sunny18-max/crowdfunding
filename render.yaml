@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: crowdfunding-backend
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+    disk:
+      name: crowdfunding-data
+      mountPath: /data
+      sizeGB: 1
+    plan: free

@@ -2,7 +2,14 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
 // Initialize database
-const dbPath = path.join(__dirname, 'crowdfunding.db');
+const isProduction = process.env.NODE_ENV === 'production';
+const dbPath = isProduction ? '/data/crowdfunding.db' : path.join(__dirname, 'crowdfunding.db');
+
+// Create data directory in production if it doesn't exist
+if (isProduction && !require('fs').existsSync('/data')) {
+  require('fs').mkdirSync('/data', { recursive: true });
+}
+
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error('Error opening database:', err);

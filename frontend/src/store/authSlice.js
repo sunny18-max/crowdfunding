@@ -25,7 +25,14 @@ export const login = createAsyncThunk(
       localStorage.setItem('user', JSON.stringify(response.data.user));
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.error || 'Login failed');
+      console.error('Login error:', error);
+      if (error.code === 'ECONNABORTED') {
+        return rejectWithValue('Request timeout. Backend may be waking up, please try again.');
+      }
+      if (error.code === 'ERR_NETWORK') {
+        return rejectWithValue('Network error. Please check your connection or try again.');
+      }
+      return rejectWithValue(error.response?.data?.error || error.message || 'Login failed');
     }
   }
 );
