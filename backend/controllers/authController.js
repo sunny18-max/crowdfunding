@@ -2,16 +2,22 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../database/dbHelper');
 
-// Register new user
+// Register new user with role
 exports.register = async (req, res, next) => {
   try {
-    const { name, email, password, wallet_balance = 1000 } = req.body; // Set default wallet balance
-    console.log('Registration attempt for:', { email, name });
+    const { name, email, password, role = 'investor', wallet_balance = 1000 } = req.body;
+    console.log('Registration attempt for:', { email, name, role });
 
     // Validate input
     if (!name || !email || !password) {
       console.log('Missing required fields');
       return res.status(400).json({ error: 'Please provide all required fields' });
+    }
+
+    // Validate role
+    const validRoles = ['admin', 'entrepreneur', 'investor'];
+    if (!validRoles.includes(role)) {
+      return res.status(400).json({ error: 'Invalid role. Must be admin, entrepreneur, or investor' });
     }
 
     // Check if user already exists
@@ -25,19 +31,25 @@ exports.register = async (req, res, next) => {
     console.log('Hashing password...');
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Insert user
-    console.log('Inserting new user...');
+    // Insert user with role
+    console.log('Inserting new user with role:', role);
     const result = await db.run(
-      'INSERT INTO users (name, email, password, wallet_balance) VALUES (?, ?, ?, ?)',
-      [name, email, hashedPassword, wallet_balance]
+      'INSERT INTO users (name, email, password, role, wallet_balance) VALUES (?, ?, ?, ?, ?)',
+      [name, email, hashedPassword, role, wallet_balance]
     );
 
     const userId = result.lastID;
     console.log('User created with ID:', userId);
 
-    // Generate JWT token
+    // Log user activity
+    await db.run(
+      'INSERT INTO user_activity_log (user_id, activity_type, activity_description) VALUES (?, ?, ?)',
+      [userId, 'registration', `User registered as ${role}`]
+    );
+
+    // Generate JWT token with role
     const token = jwt.sign(
-      { userId, email },
+      { userId, email, role },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -48,7 +60,9 @@ exports.register = async (req, res, next) => {
       user: {
         id: userId,
         name,
-        email
+        email,
+        role,
+        wallet_balance
       }
     });
   } catch (error) {
@@ -89,9 +103,21 @@ exports.login = async (req, res, next) => {
 
     console.log('Password matched, generating token...');
     
-    // Generate JWT token
+    // Update last login
+    await db.run(
+      'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?',
+      [user.id]
+    );
+
+    // Log user activity
+    await db.run(
+      'INSERT INTO user_activity_log (user_id, activity_type, activity_description) VALUES (?, ?, ?)',
+      [user.id, 'login', 'User logged in']
+    );
+    
+    // Generate JWT token with role
     const token = jwt.sign(
-      { userId: user.id, email: user.email },
+      { userId: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -104,7 +130,10 @@ exports.login = async (req, res, next) => {
       user: {
         id: user.id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        role: user.role,
+        wallet_balance: user.wallet_balance,
+        is_verified: user.is_verified
       }
     });
   } catch (error) {
@@ -117,7 +146,7 @@ exports.login = async (req, res, next) => {
 exports.getCurrentUser = async (req, res, next) => {
   try {
     const user = await db.get(
-      'SELECT id, name, email, created_at FROM users WHERE id = ?',
+      'SELECT id, name, email, role, wallet_balance, is_verified, profile_image, bio, phone, location, created_at FROM users WHERE id = ?',
       [req.user.userId]
     );
 

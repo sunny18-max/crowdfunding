@@ -24,9 +24,9 @@ class AnalyticsService {
         c.id,
         c.title,
         c.goal_amount,
-        c.total_pledged as current_funds,
+        c.current_funds,
         c.status,
-        (c.total_pledged * 100.0 / c.goal_amount) as funding_percentage,
+        (c.current_funds * 100.0 / c.goal_amount) as funding_percentage,
         COUNT(DISTINCT p.id) as total_backers,
         AVG(p.amount) as avg_pledge,
         u.name as creator_name
@@ -34,7 +34,7 @@ class AnalyticsService {
       LEFT JOIN pledges p ON c.id = p.campaign_id
       LEFT JOIN users u ON c.creator_id = u.id
       GROUP BY c.id
-      ORDER BY c.total_pledged DESC
+      ORDER BY c.current_funds DESC
       LIMIT ?
     `, [limit]);
   }
@@ -48,17 +48,17 @@ class AnalyticsService {
       SELECT 
         c.id,
         c.title,
+        c.current_funds,
         c.goal_amount,
-        c.total_pledged as current_funds,
         c.deadline,
-        (c.total_pledged * 100.0 / c.goal_amount) as funding_percentage,
+        (c.current_funds * 100.0 / c.goal_amount) as funding_percentage,
         COUNT(p.id) as backer_count,
-        c.goal_amount - c.total_pledged as shortfall
+        c.goal_amount - c.current_funds as shortfall
       FROM campaigns c
       LEFT JOIN pledges p ON c.id = p.campaign_id
       WHERE c.status = 'failed'
       GROUP BY c.id
-      HAVING c.total_pledged < c.goal_amount
+      HAVING c.current_funds < c.goal_amount
       ORDER BY funding_percentage DESC
     `);
   }
@@ -95,14 +95,14 @@ class AnalyticsService {
         c.*,
         COUNT(DISTINCT p.id) as total_backers,
         COUNT(DISTINCT p.user_id) as unique_backers,
-        SUM(p.amount) as total_pledged,
+        c.current_funds as total_pledged,
         AVG(p.amount) as avg_pledge,
         MIN(p.amount) as min_pledge,
         MAX(p.amount) as max_pledge,
-        (c.total_pledged * 100.0 / c.goal_amount) as funding_percentage,
+        (c.current_funds * 100.0 / c.goal_amount) as funding_percentage,
         julianday(c.deadline) - julianday('now') as days_remaining,
         julianday('now') - julianday(c.created_at) as campaign_age_days,
-        (c.total_pledged / (julianday('now') - julianday(c.created_at))) as avg_daily_funding
+        (c.current_funds / (julianday('now') - julianday(c.created_at))) as avg_daily_funding
       FROM campaigns c
       LEFT JOIN pledges p ON c.id = p.campaign_id
       WHERE c.id = ?
@@ -141,7 +141,7 @@ class AnalyticsService {
         COUNT(DISTINCT c.id) as campaigns_created,
         COUNT(DISTINCT p.id) as pledges_made,
         COALESCE(SUM(p.amount), 0) as total_pledged,
-        COALESCE(SUM(CASE WHEN c2.status = 'successful' THEN c2.total_pledged ELSE 0 END), 0) as total_raised,
+        COALESCE(SUM(CASE WHEN c2.status = 'successful' THEN c2.current_funds ELSE 0 END), 0) as total_raised,
         (SELECT COUNT(*) FROM pledges p2 WHERE p2.user_id = u.id) as successful_pledges,
         0 as refunded_pledges
       FROM users u
@@ -185,8 +185,8 @@ class AnalyticsService {
         SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed_count,
         SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active_count,
         ROUND(SUM(CASE WHEN status = 'successful' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) as success_rate,
-        AVG(CASE WHEN status = 'successful' THEN total_pledged ELSE NULL END) as avg_successful_amount,
-        AVG(CASE WHEN status = 'failed' THEN total_pledged ELSE NULL END) as avg_failed_amount
+        AVG(CASE WHEN status = 'successful' THEN current_funds ELSE NULL END) as avg_successful_amount,
+        AVG(CASE WHEN status = 'failed' THEN current_funds ELSE NULL END) as avg_failed_amount
       FROM campaigns
     `);
   }
@@ -202,7 +202,7 @@ class AnalyticsService {
         COUNT(p.id) as current_backers,
         julianday(c.deadline) - julianday('now') as days_remaining,
         julianday('now') - julianday(c.created_at) as days_elapsed,
-        (c.total_pledged * 1.0 / c.goal_amount) as funding_ratio
+        (c.current_funds * 1.0 / c.goal_amount) as funding_ratio
       FROM campaigns c
       LEFT JOIN pledges p ON c.id = p.campaign_id
       WHERE c.id = ?
@@ -357,7 +357,10 @@ class AnalyticsService {
         (SELECT COUNT(*) FROM campaigns) as total_campaigns,
         (SELECT COUNT(*) FROM campaigns WHERE status = 'active') as active_campaigns,
         (SELECT COUNT(*) FROM campaigns WHERE status = 'successful') as successful_campaigns,
-        (SELECT COALESCE(SUM(total_pledged), 0) FROM campaigns WHERE status = 'successful') as total_funds_raised,
+        (SELECT COALESCE(SUM(p.amount), 0) 
+         FROM pledges p 
+         JOIN campaigns c ON p.campaign_id = c.id 
+         WHERE c.status = 'successful') as total_funds_raised,
         (SELECT COUNT(*) FROM pledges) as total_pledges,
         (SELECT COALESCE(SUM(amount), 0) FROM pledges) as total_pledged_amount,
         (SELECT COALESCE(AVG(wallet_balance), 0) FROM users) as avg_user_balance,

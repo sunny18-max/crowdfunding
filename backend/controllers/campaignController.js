@@ -3,28 +3,58 @@ const db = require('../database/dbHelper');
 // Get all campaigns
 exports.getAllCampaigns = async (req, res, next) => {
   try {
+    // First, get all campaigns with creator info
     const campaigns = await db.all(`
       SELECT 
         c.*,
         u.name as creator_name,
-        u.email as creator_email,
-        COUNT(DISTINCT p.id) as backers_count
+        u.email as creator_email
       FROM campaigns c
       LEFT JOIN users u ON c.creator_id = u.id
-      LEFT JOIN pledges p ON c.id = p.campaign_id
-      GROUP BY c.id
       ORDER BY c.created_at DESC
     `);
 
-    // Calculate progress percentage for each campaign
-    const campaignsWithProgress = campaigns.map(campaign => ({
+    // Then, get backer counts and total pledged for each campaign
+    const campaignStats = await db.all(`
+      SELECT 
+        campaign_id,
+        COUNT(DISTINCT user_id) as backers_count,
+        COALESCE(SUM(amount), 0) as total_pledged
+      FROM pledges
+      GROUP BY campaign_id
+    `);
+
+    // Create a map of campaign_id to stats
+    const statsMap = new Map();
+    campaignStats.forEach(stat => {
+      statsMap.set(stat.campaign_id, {
+        backers_count: stat.backers_count,
+        total_pledged: stat.total_pledged
+      });
+    });
+
+    // Merge the stats into the campaigns
+    const campaignsWithStats = campaigns.map(campaign => ({
       ...campaign,
-      progress_percentage: campaign.goal_amount > 0 
-        ? Math.min((campaign.total_pledged / campaign.goal_amount) * 100, 100).toFixed(2)
-        : 0,
-      is_expired: new Date(campaign.deadline) < new Date(),
-      days_remaining: Math.ceil((new Date(campaign.deadline) - new Date()) / (1000 * 60 * 60 * 24))
+      backers_count: statsMap.get(campaign.id)?.backers_count || 0,
+      total_pledged: statsMap.get(campaign.id)?.total_pledged || 0
     }));
+
+    // Calculate progress percentage for each campaign
+    const campaignsWithProgress = campaignsWithStats.map(campaign => {
+      const totalPledged = Number(campaign.total_pledged || 0);
+      const goalAmount = Number(campaign.goal_amount || 1);
+      const progressPercentage = goalAmount > 0 
+        ? Math.min((totalPledged / goalAmount) * 100, 100).toFixed(2)
+        : 0;
+        
+      return {
+        ...campaign,
+        progress_percentage: progressPercentage,
+        is_expired: new Date(campaign.deadline) < new Date(),
+        days_remaining: Math.max(0, Math.ceil((new Date(campaign.deadline) - new Date()) / (1000 * 60 * 60 * 24)))
+      };
+    });
 
     res.json({ campaigns: campaignsWithProgress });
   } catch (error) {
@@ -37,6 +67,7 @@ exports.getCampaignById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
+    // Get basic campaign info
     const campaign = await db.get(`
       SELECT 
         c.*,
@@ -51,6 +82,15 @@ exports.getCampaignById = async (req, res, next) => {
       return res.status(404).json({ error: 'Campaign not found' });
     }
 
+    // Get total pledged and backers count
+    const stats = await db.get(`
+      SELECT 
+        COALESCE(SUM(amount), 0) as total_pledged,
+        COUNT(DISTINCT user_id) as backers_count
+      FROM pledges 
+      WHERE campaign_id = ?
+    `, [id]);
+
     // Get backers
     const backers = await db.all(`
       SELECT 
@@ -58,24 +98,31 @@ exports.getCampaignById = async (req, res, next) => {
         p.amount,
         p.timestamp,
         u.name as backer_name,
-        t.status as transaction_status
+        u.id as backer_id,
+        p.status as pledge_status
       FROM pledges p
       LEFT JOIN users u ON p.user_id = u.id
-      LEFT JOIN transactions t ON p.id = t.pledge_id
       WHERE p.campaign_id = ?
       ORDER BY p.timestamp DESC
     `, [id]);
 
     // Calculate additional info
-    campaign.progress_percentage = campaign.goal_amount > 0 
-      ? Math.min((campaign.total_pledged / campaign.goal_amount) * 100, 100).toFixed(2)
-      : 0;
-    campaign.is_expired = new Date(campaign.deadline) < new Date();
-    campaign.days_remaining = Math.ceil((new Date(campaign.deadline) - new Date()) / (1000 * 60 * 60 * 24));
-    campaign.backers_count = backers.length;
-    campaign.backers = backers;
+    const total_pledged = stats?.total_pledged || 0;
+    const backers_count = stats?.backers_count || 0;
+    
+    const campaignWithStats = {
+      ...campaign,
+      total_pledged,
+      backers_count,
+      progress_percentage: campaign.goal_amount > 0 
+        ? Math.min((total_pledged / campaign.goal_amount) * 100, 100).toFixed(2)
+        : 0,
+      is_expired: new Date(campaign.deadline) < new Date(),
+      days_remaining: Math.max(0, Math.ceil((new Date(campaign.deadline) - new Date()) / (1000 * 60 * 60 * 24))),
+      backers: backers || []
+    };
 
-    res.json({ campaign });
+    res.json({ campaign: campaignWithStats });
   } catch (error) {
     next(error);
   }

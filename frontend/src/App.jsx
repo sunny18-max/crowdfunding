@@ -2,24 +2,26 @@ import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Sidebar from './components/Sidebar';
-import Landing from './pages/Landing';
+import LandingEnhanced from './pages/LandingEnhanced';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
+import EnhancedDashboard from './pages/EnhancedDashboard';
 import CampaignDetails from './pages/CampaignDetails';
 import CreateCampaign from './pages/CreateCampaign';
 import MyPledges from './pages/MyPledges';
 import WalletDashboard from './pages/WalletDashboard';
 import AnalyticsDashboard from './pages/AnalyticsDashboard';
+import AdminManagement from './pages/AdminManagement';
+import Settings from './pages/Settings';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
 // Layout for authenticated users (with sidebar)
 const DashboardLayout = () => (
-  <div className="min-h-screen bg-gray-50 flex">
+  <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex">
     <Sidebar />
-    <main className="flex-1 lg:ml-64 p-4 sm:p-6 lg:p-8">
+    <main className="flex-1 lg:ml-64">
       <Outlet />
     </main>
   </div>
@@ -50,7 +52,7 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route element={<PublicLayout />}>
-          <Route path="/landing" element={!isAuthenticated ? <Landing /> : <Navigate to="/" />} />
+          <Route path="/landing" element={!isAuthenticated ? <LandingEnhanced /> : <Navigate to="/" />} />
           <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
           <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/" />} />
         </Route>
@@ -58,10 +60,13 @@ function App() {
         {/* Authenticated Routes */}
         <Route element={isAuthenticated ? <DashboardLayout /> : <Navigate to="/landing" />}>
           <Route path="/" element={<Home />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<EnhancedDashboard />} />
           <Route path="/create-campaign" element={<CreateCampaign />} />
           <Route path="/my-pledges" element={<MyPledges />} />
           <Route path="/wallet" element={<WalletDashboard />} />
+          <Route path="/users" element={<AdminManagement />} />
+          <Route path="/campaigns" element={<AdminManagement />} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
 
         {/* Routes accessible to both logged-in and public users */}

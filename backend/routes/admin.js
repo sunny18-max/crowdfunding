@@ -7,11 +7,34 @@ const bcrypt = require('bcryptjs');
 router.get('/users', async (req, res) => {
   try {
     const users = await db.all(
-      'SELECT id, name, email, wallet_balance, created_at FROM users'
+      'SELECT id, name, email, role, wallet_balance, is_verified, is_active, created_at FROM users ORDER BY created_at DESC'
     );
     res.json({
       count: users.length,
       users
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get all pledges
+router.get('/pledges', async (req, res) => {
+  try {
+    const pledges = await db.all(`
+      SELECT 
+        p.*,
+        u.name as user_name,
+        u.email as user_email,
+        c.title as campaign_title
+      FROM pledges p
+      LEFT JOIN users u ON p.user_id = u.id
+      LEFT JOIN campaigns c ON p.campaign_id = c.id
+      ORDER BY p.timestamp DESC
+    `);
+    res.json({
+      count: pledges.length,
+      pledges
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

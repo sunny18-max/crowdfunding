@@ -263,11 +263,16 @@ class WalletService {
   }
 
   /**
-   * Get user wallet balance and transaction history
+   * Get user wallet balance and transaction history with enhanced details
    */
   static async getWalletInfo(userId) {
+    // Get comprehensive user details
     const user = await db.get(
-      'SELECT id, name, email, wallet_balance FROM users WHERE id = ?',
+      `SELECT 
+        id, name, email, role, wallet_balance, 
+        bio, phone, location, profile_image,
+        is_verified, is_active, created_at, last_login
+       FROM users WHERE id = ?`,
       [userId]
     );
 
@@ -275,6 +280,7 @@ class WalletService {
       throw new Error('User not found');
     }
 
+    // Get transaction history
     const transactions = await db.all(
       `SELECT * FROM wallet_transactions 
        WHERE user_id = ? 
@@ -283,6 +289,7 @@ class WalletService {
       [userId]
     );
 
+    // Get transaction statistics
     const stats = await db.get(
       `SELECT 
         COUNT(*) as total_transactions,
@@ -294,10 +301,57 @@ class WalletService {
       [userId]
     );
 
+    // Get user's pledge summary
+    const pledgeSummary = await db.get(
+      `SELECT 
+        COUNT(*) as total_pledges,
+        SUM(amount) as amount,
+        COUNT(CASE WHEN status = 'committed' THEN 1 END) as successful_pledges,
+        COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending_pledges,
+        COUNT(CASE WHEN status = 'rolled_back' THEN 1 END) as refunded_pledges
+       FROM pledges
+       WHERE user_id = ?`,
+      [userId]
+    );
+    
+    // For backward compatibility, add total_pledged alias
+    if (pledgeSummary) {
+      pledgeSummary.total_pledged = pledgeSummary.amount || 0;
+    }
+
+    // Get user's campaign summary (if entrepreneur)
+    let campaignSummary = null;
+    if (user.role === 'entrepreneur') {
+      campaignSummary = await db.get(
+        `SELECT 
+          COUNT(*) as total_campaigns,
+          SUM(current_funds) as total_raised,
+          COUNT(CASE WHEN status = 'successful' THEN 1 END) as successful_campaigns,
+          COUNT(CASE WHEN status = 'active' THEN 1 END) as active_campaigns,
+          COUNT(CASE WHEN status = 'failed' THEN 1 END) as failed_campaigns
+         FROM campaigns
+         WHERE creator_id = ?`,
+        [userId]
+      );
+    }
+
+    // Get recent activity
+    const recentActivity = await db.all(
+      `SELECT activity_type, activity_description, timestamp
+       FROM user_activity_log
+       WHERE user_id = ?
+       ORDER BY timestamp DESC
+       LIMIT 10`,
+      [userId]
+    );
+
     return {
       user,
       transactions,
-      stats
+      stats,
+      pledgeSummary,
+      campaignSummary,
+      recentActivity
     };
   }
 

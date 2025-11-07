@@ -67,12 +67,31 @@ const pledgeSlice = createSlice({
         state.error = action.payload;
       })
       // Fetch user pledges
+      .addCase(fetchUserPledges.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(fetchUserPledges.fulfilled, (state, action) => {
-        state.pledges = action.payload;
+        state.loading = false;
+        state.pledges = action.payload || [];
+        console.log('Pledges loaded:', action.payload);
+      })
+      .addCase(fetchUserPledges.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.pledges = [];
       })
       // Fetch stats
+      .addCase(fetchUserPledgeStats.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(fetchUserPledgeStats.fulfilled, (state, action) => {
-        state.stats = action.payload;
+        state.loading = false;
+        state.stats = action.payload || {};
+      })
+      .addCase(fetchUserPledgeStats.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

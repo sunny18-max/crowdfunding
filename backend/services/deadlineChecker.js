@@ -32,9 +32,9 @@ async function processExpiredCampaigns() {
 // Process a single campaign
 async function processCampaign(campaign) {
   console.log(`\n🎯 Processing campaign: ${campaign.title} (ID: ${campaign.id})`);
-  console.log(`   Goal: $${campaign.goal_amount} | Pledged: $${campaign.total_pledged}`);
+  console.log(`   Goal: $${campaign.goal_amount} | Pledged: $${campaign.current_funds}`);
 
-  const goalMet = campaign.total_pledged >= campaign.goal_amount;
+  const goalMet = campaign.current_funds >= campaign.goal_amount;
 
   try {
     // Use SQLite transaction for atomic operation

@@ -42,6 +42,14 @@ export const campaignsAPI = {
   create: (campaignData) => api.post('/campaigns', campaignData),
   update: (id, campaignData) => api.put(`/campaigns/${id}`, campaignData),
   delete: (id) => api.delete(`/campaigns/${id}`),
+  uploadVideo: (campaignId, formData, config) => 
+    api.post(`/campaigns/${campaignId}/upload-video`, formData, {
+      ...config,
+      headers: {
+        ...config?.headers,
+        'Content-Type': 'multipart/form-data',
+      },
+    }),
 };
 
 // Pledges API

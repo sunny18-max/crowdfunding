@@ -15,6 +15,7 @@ const transactionRoutes = require('./routes/transactions');
 const walletRoutes = require('./routes/wallet');
 const analyticsRoutes = require('./routes/analytics');
 const adminRoutes = require('./routes/admin');
+const dashboardRoutes = require('./routes/dashboard');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -46,6 +47,12 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Test Routes
+const testRoutes = require('./routes/test');
+const testDashboardRoutes = require('./routes/testDashboard');
+app.use('/api/test', testRoutes);
+app.use('/api/test', testDashboardRoutes);
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/campaigns', campaignRoutes);
@@ -54,6 +61,7 @@ app.use('/api/transactions', transactionRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // 404 handler
 app.use((req, res) => {

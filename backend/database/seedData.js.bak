@@ -1,0 +1,236 @@
+const bcrypt = require('bcryptjs');
+
+// Sample data for seeding the database
+async function getSeedData() {
+  // Hash passwords
+  const hashedPassword = await bcrypt.hash('password123', 10);
+
+  const users = [
+    {
+      name: 'Admin User',
+      email: 'admin@fundstarter.com',
+      password: hashedPassword,
+      role: 'admin',
+      wallet_balance: 50000,
+      bio: 'Platform administrator managing FundStarter',
+      phone: '+1-555-0100',
+      location: 'San Francisco, CA',
+      is_verified: 1
+    },
+    {
+      name: 'Sarah Johnson',
+      email: 'sarah.johnson@example.com',
+      password: hashedPassword,
+      role: 'entrepreneur',
+      wallet_balance: 5000,
+      bio: 'Tech entrepreneur passionate about sustainable innovation',
+      phone: '+1-555-0101',
+      location: 'Austin, TX',
+      is_verified: 1
+    },
+    {
+      name: 'Michael Chen',
+      email: 'michael.chen@example.com',
+      password: hashedPassword,
+      role: 'entrepreneur',
+      wallet_balance: 3500,
+      bio: 'Game developer creating immersive experiences',
+      phone: '+1-555-0102',
+      location: 'Seattle, WA',
+      is_verified: 1
+    },
+    {
+      name: 'Emily Rodriguez',
+      email: 'emily.rodriguez@example.com',
+      password: hashedPassword,
+      role: 'entrepreneur',
+      wallet_balance: 4200,
+      bio: 'Social entrepreneur focused on education technology',
+      phone: '+1-555-0103',
+      location: 'Boston, MA',
+      is_verified: 1
+    },
+    {
+      name: 'David Park',
+      email: 'david.park@example.com',
+      password: hashedPassword,
+      role: 'investor',
+      wallet_balance: 150000,
+      bio: 'Angel investor supporting innovative startups',
+      phone: '+1-555-0104',
+      location: 'New York, NY',
+      is_verified: 1
+    },
+    {
+      name: 'Lisa Thompson',
+      email: 'lisa.thompson@example.com',
+      password: hashedPassword,
+      role: 'investor',
+      wallet_balance: 120000,
+      bio: 'Tech enthusiast and early adopter',
+      phone: '+1-555-0105',
+      location: 'Los Angeles, CA',
+      is_verified: 1
+    },
+    {
+      name: 'James Wilson',
+      email: 'james.wilson@example.com',
+      password: hashedPassword,
+      role: 'investor',
+      wallet_balance: 130000,
+      bio: 'Supporting creative projects and innovations',
+      phone: '+1-555-0106',
+      location: 'Chicago, IL',
+      is_verified: 1
+    }
+  ];
+
+  // Calculate deadline dates (30, 45, 60 days from now)
+  const getDeadline = (days) => {
+    const date = new Date();
+    date.setDate(date.getDate() + days);
+    return date.toISOString();
+  };
+
+  const campaigns = [
+    {
+      title: 'EcoSmart Home Hub - Sustainable Smart Home System',
+      description: 'Revolutionary smart home system powered by renewable energy. Control your entire home while reducing your carbon footprint by 60%. Features AI-powered energy optimization, solar integration, and real-time sustainability tracking. Join us in making homes smarter and greener!',
+      goal_amount: 50000,
+      current_funds: 38500,
+      deadline: getDeadline(30),
+      creator_id: 2, // Sarah Johnson
+      status: 'active'
+    },
+    {
+      title: 'Pixel Quest - Retro-Style Adventure RPG',
+      description: 'An epic 16-bit style RPG with modern gameplay mechanics. Explore a vast fantasy world, battle unique monsters, and uncover ancient mysteries. Features 40+ hours of gameplay, original soundtrack, and hand-crafted pixel art. Perfect for fans of classic JRPGs!',
+      goal_amount: 35000,
+      current_funds: 42000,
+      deadline: getDeadline(15),
+      creator_id: 3, // Michael Chen
+      status: 'successful'
+    },
+    {
+      title: 'CodeKids Academy - Interactive Coding Platform for Children',
+      description: 'Making coding fun and accessible for kids aged 6-14. Our gamified platform teaches programming fundamentals through interactive stories and challenges. Includes parent dashboard, progress tracking, and curriculum aligned with educational standards.',
+      goal_amount: 45000,
+      current_funds: 31200,
+      deadline: getDeadline(45),
+      creator_id: 4, // Emily Rodriguez
+      status: 'active'
+    },
+    {
+      title: 'Urban Garden Kit - Grow Fresh Produce Anywhere',
+      description: 'Complete hydroponic garden system for apartments and small spaces. Grow herbs, vegetables, and fruits year-round with our automated watering and LED grow light system. Includes starter seeds, nutrients, and mobile app for monitoring plant health.',
+      goal_amount: 25000,
+      current_funds: 19800,
+      deadline: getDeadline(60),
+      creator_id: 2, // Sarah Johnson
+      status: 'active'
+    },
+    {
+      title: 'MindfulMe - Mental Wellness Companion App',
+      description: 'AI-powered mental health app combining meditation, mood tracking, and personalized wellness recommendations. Features guided sessions, journaling, breathing exercises, and connection with licensed therapists. Your pocket-sized wellness coach.',
+      goal_amount: 40000,
+      current_funds: 28600,
+      deadline: getDeadline(40),
+      creator_id: 4, // Emily Rodriguez
+      status: 'active'
+    },
+    {
+      title: 'ArtisanCraft Marketplace - Supporting Local Artisans',
+      description: 'Online platform connecting local artisans with customers worldwide. Fair trade marketplace featuring handmade jewelry, pottery, textiles, and art. 80% of proceeds go directly to creators. Help us empower artisan communities globally.',
+      goal_amount: 30000,
+      current_funds: 22400,
+      deadline: getDeadline(35),
+      creator_id: 2, // Sarah Johnson
+      status: 'active'
+    },
+    {
+      title: 'RoboLearn - Educational Robotics Kit',
+      description: 'Build and program your own robots! Complete kit with motors, sensors, and drag-and-drop programming interface. Perfect for STEM education and hobbyists. Includes 20+ project guides from beginner to advanced levels.',
+      goal_amount: 55000,
+      current_funds: 47300,
+      deadline: getDeadline(25),
+      creator_id: 3, // Michael Chen
+      status: 'active'
+    },
+    {
+      title: 'FreshMeal Prep - Automated Meal Planning Service',
+      description: 'AI-powered meal planning and grocery delivery service. Personalized recipes based on dietary preferences, automated shopping lists, and ingredient delivery. Save time, eat healthier, and reduce food waste by 40%.',
+      goal_amount: 60000,
+      current_funds: 15200,
+      deadline: getDeadline(50),
+      creator_id: 4, // Emily Rodriguez
+      status: 'active'
+    },
+    {
+      title: 'VR Fitness Studio - Immersive Workout Experience',
+      description: 'Virtual reality fitness platform making exercise fun and engaging. Box, dance, and train in stunning virtual environments. Includes multiplayer modes, personal trainer AI, and progress tracking. Compatible with all major VR headsets.',
+      goal_amount: 75000,
+      current_funds: 52800,
+      deadline: getDeadline(20),
+      creator_id: 3, // Michael Chen
+      status: 'active'
+    },
+    {
+      title: 'BookBridge - Community Library Exchange',
+      description: 'Mobile app connecting book lovers for lending and swapping. Build your digital library, discover new reads, and connect with local book clubs. Features book recommendations, reading challenges, and author events.',
+      goal_amount: 20000,
+      current_funds: 8500,
+      deadline: getDeadline(-5), // Past deadline
+      creator_id: 4, // Emily Rodriguez
+      status: 'failed'
+    }
+  ];
+
+  // Sample pledges for campaigns
+  const pledges = [
+    // Pledges for EcoSmart Home Hub (Campaign 1)
+    { user_id: 5, campaign_id: 1, amount: 15000, status: 'committed' },
+    { user_id: 6, campaign_id: 1, amount: 12500, status: 'committed' },
+    { user_id: 7, campaign_id: 1, amount: 11000, status: 'committed' },
+    
+    // Pledges for Pixel Quest (Campaign 2 - Successful)
+    { user_id: 5, campaign_id: 2, amount: 20000, status: 'committed' },
+    { user_id: 6, campaign_id: 2, amount: 12000, status: 'committed' },
+    { user_id: 7, campaign_id: 2, amount: 10000, status: 'committed' },
+    
+    // Pledges for CodeKids Academy (Campaign 3)
+    { user_id: 5, campaign_id: 3, amount: 18000, status: 'committed' },
+    { user_id: 6, campaign_id: 3, amount: 13200, status: 'committed' },
+    
+    // Pledges for Urban Garden Kit (Campaign 4)
+    { user_id: 7, campaign_id: 4, amount: 10000, status: 'committed' },
+    { user_id: 5, campaign_id: 4, amount: 9800, status: 'committed' },
+    
+    // Pledges for MindfulMe (Campaign 5)
+    { user_id: 6, campaign_id: 5, amount: 15000, status: 'committed' },
+    { user_id: 7, campaign_id: 5, amount: 13600, status: 'committed' },
+    
+    // Pledges for ArtisanCraft (Campaign 6)
+    { user_id: 5, campaign_id: 6, amount: 12000, status: 'committed' },
+    { user_id: 6, campaign_id: 6, amount: 10400, status: 'committed' },
+    
+    // Pledges for RoboLearn (Campaign 7)
+    { user_id: 7, campaign_id: 7, amount: 25000, status: 'committed' },
+    { user_id: 5, campaign_id: 7, amount: 22300, status: 'committed' },
+    
+    // Pledges for FreshMeal Prep (Campaign 8)
+    { user_id: 6, campaign_id: 8, amount: 8000, status: 'committed' },
+    { user_id: 7, campaign_id: 8, amount: 7200, status: 'committed' },
+    
+    // Pledges for VR Fitness (Campaign 9)
+    { user_id: 5, campaign_id: 9, amount: 28000, status: 'committed' },
+    { user_id: 6, campaign_id: 9, amount: 24800, status: 'committed' },
+    
+    // Pledges for BookBridge (Campaign 10 - Failed)
+    { user_id: 5, campaign_id: 10, amount: 4000, status: 'refunded' },
+    { user_id: 6, campaign_id: 10, amount: 4500, status: 'refunded' }
+  ];
+
+  return { users, campaigns, pledges };
+}
+
+module.exports = { getSeedData };

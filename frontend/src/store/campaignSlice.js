@@ -50,6 +50,26 @@ export const createCampaign = createAsyncThunk(
   }
 );
 
+export const uploadCampaignVideo = createAsyncThunk(
+  'campaigns/uploadVideo',
+  async ({ campaignId, videoFile }, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append('video', videoFile);
+      
+      const response = await campaignsAPI.uploadVideo(campaignId, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      return response.data; // Should contain video URL and any other relevant data
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.error || 'Failed to upload video');
+    }
+  }
+);
+
 export const updateCampaign = createAsyncThunk(
   'campaigns/update',
   async ({ id, data }, { rejectWithValue }) => {
